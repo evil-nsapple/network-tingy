@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Network Monitor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+    header {
+      padding: 1rem;
+      background-color: #0078d4;
+      color: white;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem auto;
+      max-width: 1200px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background-color: #0078d4;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Network Monitor</h1>
+  </header>
+  <table>
+    <thead>
+      <tr>
+        <th>Source IP</th>
+        <th>Destination IP</th>
+        <th>Protocol</th>
+        <th>Timestamp</th>
+      </tr>
+    </thead>
+    <tbody id="network-data"></tbody>
+  </table>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const tableBody = document.getElementById("network-data");
+
+    // Append a row to the table
+    function appendRow(data) {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${data.sourceIP}</td>
+        <td>${data.destIP}</td>
+        <td>${data.protocol}</td>
+        <td>${data.timestamp}</td>
+      `;
+      tableBody.appendChild(row);
+    }
+
+    // Load initial data
+    socket.on("initial-data", (data) => {
+      data.forEach((entry) => appendRow(entry));
+    });
+
+    // Listen for new network data
+    socket.on("network-data", (data) => {
+      appendRow(data);
+    });
+  </script>
+</body>
+</html>
